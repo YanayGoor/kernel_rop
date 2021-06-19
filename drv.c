@@ -23,6 +23,8 @@
 #define DEVICE_NAME "vulndrv"
 #define DEVICE_PATH "/dev/vulndrv"
 
+typedef void op_t(void);
+
 static int device_open(struct inode *, struct file *);
 static long device_ioctl(struct file *, unsigned int, unsigned long);
 static int device_release(struct inode *, struct file *f);
@@ -57,7 +59,7 @@ static long device_ioctl(struct file *file, unsigned int cmd, unsigned long args
 		req = (struct drv_req *)args;
 		printk(KERN_INFO "size = %lx\n", req->offset);
                 printk(KERN_INFO "fn is at %p\n", &ops[req->offset]);
-		fn = &ops[req->offset];
+		fn = (op_t *)&ops[req->offset];
 		fn();
 		break;
 	default:
