@@ -1,14 +1,20 @@
 obj-m += drv.o
 
+KDIR := /lib/modules/$(shell uname -r)/build
+
 CC=gcc
 ccflags-y += "-g"
 ccflags-y += "-O0"
 
 all:
-	make -C /lib/modules/$(shell uname -r)/build M=$(PWD) modules
+	make -C $(KDIR) M=$(PWD) modules
 	# compile the trigger
-	$(CC) trigger.c -O2 -o trigger
+	$(CC) rop_exploit.c -static -o rop_exploit
+
+install: all
+	sudo rmmod drv; sudo insmod drv.ko
 
 clean:
-	make -C /lib/modules/$(shell uname -r)/build M=$(PWD) clean
+	make -C $(KDIR) M=$(PWD) clean
 	rm -fr ./trigger
+
